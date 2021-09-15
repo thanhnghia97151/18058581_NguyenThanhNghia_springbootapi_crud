@@ -15,5 +15,40 @@ import java.util.Optional;
 @Controller
 public class EmployeeController {
 
-    
+    @Autowired
+    private EmployeeService employeeService;
+
+    @RequestMapping("/")
+    public String index(Model model) {
+        List<Employee> employee = employeeService.getAllEmployee();
+
+        model.addAttribute("employees", employee);
+
+        return "index";
+    }
+
+    @RequestMapping(value = "add")
+    public String addUser(Model model) {
+        model.addAttribute("employee", new Employee());
+        return "addEmployee";
+    }
+
+    @RequestMapping(value = "/edit", method = RequestMethod.GET)
+    public String editUser(@RequestParam("id") Long employeeId, Model model) {
+        Optional<Employee> employeeEdit = employeeService.findEmployeeById(employeeId);
+        employeeEdit.ifPresent(employee -> model.addAttribute("employee", employee));
+        return "editEmployee";
+    }
+
+    @RequestMapping(value = "save", method = RequestMethod.POST)
+    public String save(Employee employee) {
+        employeeService.saveEmployee(employee);
+        return "redirect:/";
+    }
+
+    @RequestMapping(value = "/delete", method = RequestMethod.GET)
+    public String deleteUser(@RequestParam("id") Long employId, Model model) {
+        employeeService.deleteEmployee(employId);
+        return "redirect:/";
+    }
 }
